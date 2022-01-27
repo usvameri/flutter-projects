@@ -42,6 +42,35 @@ class _VoiceHomeState extends State<VoiceHome> {
   SpeechRecognition _speechRecognition;
   bool _isAvailable = false;
   bool _isListening = false;
+
+  String resultText = "";
+
+  @override
+  void initState(){
+    super.initState();
+    initSpeechRecognizer();
+  }
+
+  void initSpeechRecognizer(){
+    _speechRecognition = SpeechRecognition();
+      _speechRecognition.setAvailabilityHandler(
+        (bool result) => setState(() => _isAvailable = result));
+        // set new value to isAvailable with setstate func > boolean result and return setState func
+
+      _speechRecognition.setRecognitionStartedHandler(
+        () => setState(() => _isListening = true));
+        // pass true value to isListening field when recognizer is started 
+
+      _speechRecognition.setRecognitionResultHandler(
+        (String text) => setState(() => resultText = text));
+
+      _speechRecognition.setRecognitionCompleteHandler(
+        () => setState(() => _isListening = false));
+      
+      _speechRecognition.activate().then((value) => setState(() => _isAvailable = value));
+  }
+
+
   @override
   Widget build(BuildContext context){
     return Scaffold();
