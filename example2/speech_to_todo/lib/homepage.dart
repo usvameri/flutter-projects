@@ -3,6 +3,7 @@
 import 'package:avatar_glow/avatar_glow.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:speech_to_text/speech_to_text.dart' as stt;
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -14,6 +15,37 @@ class HomePage extends StatefulWidget {
 class _HomePageSate extends State<HomePage> {
   bool isListening = false;
   String text = "Press button for record your notes.";
+  var _speechToText = stt.SpeechToText();
+  void listen() async {
+    if (!isListening) {
+      bool available = await _speechToText.initialize(
+        onStatus: (status) => print("$status"),
+        onError: (errorNotification) => print("$errorNotification"),
+      );
+      if (available) {
+        setState(() {
+          isListening = true;
+        });
+        _speechToText.listen(
+            onResult: (result) => setState(() {
+                  text = result.recognizedWords;
+                }));
+      }
+    } else {
+      setState(() {
+        isListening = false;
+        _speechToText.stop();
+      });
+    }
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _speechToText = stt.SpeechToText();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -50,9 +82,14 @@ class _HomePageSate extends State<HomePage> {
               label: "Finished"),
         ],
       ),
-      body: Container(
-        child: Text(
-          text = text,
+      body: SingleChildScrollView(
+        child: Container(
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Text(
+              text = text,
+            ),
+          ),
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
@@ -63,7 +100,7 @@ class _HomePageSate extends State<HomePage> {
         duration: Duration(milliseconds: 1000),
         glowColor: Colors.blue,
         child: FloatingActionButton(
-          onPressed: () => {},
+          onPressed: () => {listen()},
           child: Icon(isListening ? Icons.mic : Icons.mic_none),
         ),
       ),
