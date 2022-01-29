@@ -1,4 +1,8 @@
+// import 'dart:html';
+
+import 'package:avatar_glow/avatar_glow.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -8,6 +12,8 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageSate extends State<HomePage> {
+  bool isListening = false;
+  String text = "Press button for record your notes.";
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -20,7 +26,7 @@ class _HomePageSate extends State<HomePage> {
       ),
       bottomNavigationBar: BottomNavigationBar(
         backgroundColor: Colors.blue,
-        selectedItemColor: Colors.black,
+        selectedItemColor: Colors.indigo,
         unselectedItemColor: Colors.white,
         type: BottomNavigationBarType.fixed,
         items: const <BottomNavigationBarItem>[
@@ -32,7 +38,7 @@ class _HomePageSate extends State<HomePage> {
               label: "List"),
           BottomNavigationBarItem(
               icon: Icon(
-                Icons.home,
+                Icons.mic,
                 color: Colors.white,
               ),
               label: "Record"),
@@ -43,6 +49,23 @@ class _HomePageSate extends State<HomePage> {
               ),
               label: "Finished"),
         ],
+      ),
+      body: Container(
+        child: Text(
+          text = text,
+        ),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButton: AvatarGlow(
+        animate: isListening,
+        repeat: true,
+        endRadius: 80,
+        duration: Duration(milliseconds: 1000),
+        glowColor: Colors.blue,
+        child: FloatingActionButton(
+          onPressed: () => {},
+          child: Icon(isListening ? Icons.mic : Icons.mic_none),
+        ),
       ),
     );
   }
