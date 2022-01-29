@@ -102,6 +102,7 @@ class _HomePageSate extends State<HomePage> {
         child: FloatingActionButton(
           onPressed: () => {listen()},
           child: Icon(isListening ? Icons.mic : Icons.mic_none),
+          backgroundColor: isListening ? Colors.red : Colors.blue,
         ),
       ),
     );
