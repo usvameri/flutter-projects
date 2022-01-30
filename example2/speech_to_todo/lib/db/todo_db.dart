@@ -40,7 +40,7 @@ class TodoDatabase {
       ${TodoFields.description} $textType,
       ${TodoFields.priority} $boolType,
       ${TodoFields.done} $boolType,
-      ${TodoFields.createdTime} $datetimeType,
+      ${TodoFields.createdTime} $textType
     )
     ''');
   }

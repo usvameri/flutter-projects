@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:speech_to_todo/homepage.dart';
+import 'package:speech_to_todo/pages/notesPage.dart';
 import 'homepage.dart';
 
 void main() {
@@ -19,7 +20,8 @@ class MyApp extends StatelessWidget {
         textTheme: GoogleFonts.montserratTextTheme(Theme.of(context).textTheme),
         primarySwatch: Colors.blue,
       ),
-      home: const HomePage(),
+      // home: const HomePage(),
+      home: NotesPage(),
     );
   }
 }
