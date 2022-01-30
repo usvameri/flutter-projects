@@ -1,6 +1,14 @@
 final String tableTodos = "todos";
 
 class TodoFields {
+  static final List<String> values = [
+    id,
+    title,
+    description,
+    done,
+    priority,
+    createdTime
+  ];
   // column names of todos table
   static final String id = '_id';
   static final String title = 'title';
@@ -35,6 +43,15 @@ class Todo {
         TodoFields.done: done ? 1 : 0,
         TodoFields.createdTime: createdTime.toIso8601String()
       };
+
+  static Todo fromJson(Map<String, Object?> json) => Todo(
+        id: json[TodoFields.id] as int?,
+        title: json[TodoFields.title] as String,
+        description: json[TodoFields.description] as String,
+        priority: json[TodoFields.priority] == 1,
+        done: json[TodoFields.done] == 1,
+        createdTime: DateTime.parse(json[TodoFields.createdTime] as String),
+      );
 
   Todo copy({
     int? id,

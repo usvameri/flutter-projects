@@ -1,7 +1,10 @@
+import 'dart:convert';
 import 'package:sqflite/sqflite.dart';
 import 'package:speech_to_todo/models/todo.dart';
 import 'package:path/path.dart'; //join func
 
+//also rawDelete/rawInsert/rawQuery/rawUpdate can be use
+//TODO: get items with conditions like => get only done records
 class TodoDatabase {
   static final TodoDatabase instance = TodoDatabase.init();
 
@@ -60,5 +63,40 @@ class TodoDatabase {
 
     final id = await db.insert(tableTodos, todo.toJson());
     return todo.copy(id: id);
+  }
+
+  Future<int> update(Todo todo) async {
+    final db = await instance.database;
+    return db.update(tableTodos, todo.toJson(),
+        where: '$TodoFields.id = ?', whereArgs: [todo.id]);
+  }
+
+  Future<int> delete(int id) async {
+    final db = await instance.database;
+    return db
+        .delete(tableTodos, where: '${TodoFields.id} = ?', whereArgs: [id]);
+  }
+
+  Future<Todo> readTodo(int id) async {
+    final db = await instance.database;
+
+    final maps = await db.query(tableTodos,
+        columns: TodoFields.values,
+        where:
+            '${TodoFields.id} = ?', //question mark is for sql injection attack
+        whereArgs: [id]);
+    if (maps.isNotEmpty) {
+      return Todo.fromJson(maps.first);
+    } else {
+      throw Exception('ID $id not found'); // or return null
+    }
+  }
+
+  Future<List<Todo>> readAllTodos() async {
+    final db = await instance.database;
+
+    final orderBy = '${TodoFields.createdTime} ASC';
+    final result = await db.query(tableTodos, orderBy: orderBy);
+    return result.map((item) => Todo.fromJson(item)).toList();
   }
 }
