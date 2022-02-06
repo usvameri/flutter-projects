@@ -1,21 +1,23 @@
-// import 'dart:html';
-
 import 'package:avatar_glow/avatar_glow.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
+import 'package:speech_to_todo/db/todo_db.dart';
 
-class HomePage extends StatefulWidget {
-  const HomePage({Key? key}) : super(key: key);
+import '../models/todo.dart';
+
+class RecorderPage extends StatefulWidget {
+  const RecorderPage({Key? key}) : super(key: key);
 
   @override
-  _HomePageSate createState() => _HomePageSate();
+  _RecorderPage createState() => _RecorderPage();
 }
 
-class _HomePageSate extends State<HomePage> {
-  bool isListening = false;
+class _RecorderPage extends State<RecorderPage> {
+  int currentState = 1;
   String text = "Press button for record your notes.";
   var _speechToText = stt.SpeechToText();
+  bool isListening = false;
+
   void listen() async {
     if (!isListening) {
       bool available = await _speechToText.initialize(
@@ -36,6 +38,13 @@ class _HomePageSate extends State<HomePage> {
         isListening = false;
         _speechToText.stop();
       });
+      Todo newTodo = Todo(
+          title: 'Note',
+          description: this.text,
+          priority: true,
+          done: false,
+          createdTime: DateTime.now());
+      await TodoDatabase.instance.create(newTodo);
     }
   }
 
@@ -49,39 +58,6 @@ class _HomePageSate extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          "TODO APP",
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
-        centerTitle: true,
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: Colors.blue,
-        selectedItemColor: Colors.indigo,
-        unselectedItemColor: Colors.white,
-        type: BottomNavigationBarType.fixed,
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-              icon: Icon(
-                Icons.list,
-                color: Colors.white,
-              ),
-              label: "List"),
-          BottomNavigationBarItem(
-              icon: Icon(
-                Icons.mic,
-                color: Colors.white,
-              ),
-              label: "Record"),
-          BottomNavigationBarItem(
-              icon: Icon(
-                Icons.done,
-                color: Colors.white,
-              ),
-              label: "Finished"),
-        ],
-      ),
       body: SingleChildScrollView(
         child: Container(
           child: Padding(
