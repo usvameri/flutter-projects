@@ -9,7 +9,7 @@ class RecordListPage extends StatefulWidget {
 }
 
 class _RecordListPage extends State<RecordListPage> {
-  late List<Todo> todos;
+  List<Todo> todos = [];
   bool isLoading = false;
 
   @override
@@ -29,7 +29,6 @@ class _RecordListPage extends State<RecordListPage> {
     setState(() {
       isLoading = true;
     });
-
     this.todos = await TodoDatabase.instance.readAllTodos();
 
     setState(() {
@@ -39,8 +38,17 @@ class _RecordListPage extends State<RecordListPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Text('Saved Records'),
-    );
+    return ListView.builder(
+        itemCount: todos.length,
+        itemBuilder: (context, index) {
+          final item = todos[index];
+          return ListTile(
+            leading: Icon(Icons.filter_none_outlined),
+            iconColor: Colors.blue,
+            title: Text(item.title),
+            subtitle: Text(item.description),
+            textColor: Colors.blue,
+          );
+        });
   }
 }

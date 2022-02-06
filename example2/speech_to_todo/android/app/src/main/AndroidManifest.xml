@@ -11,7 +11,7 @@
         </intent>
     </queries>
    <application
-        android:label="speech_to_todo"
+        android:label="usvatodo"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
