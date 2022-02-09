@@ -16,11 +16,13 @@ class RecorderPage extends StatefulWidget {
 class _RecorderPage extends State<RecorderPage> {
   int currentState = 1;
   String text = "Press button for record your notes.";
+  String title = "Todo";
   var _speechToText = stt.SpeechToText();
   bool isListening = false;
+
   void saveSpeech() async {
     Todo newTodo = Todo(
-        title: 'Todo',
+        title: this.title,
         description: this.text,
         priority: true,
         done: false,
@@ -50,17 +52,55 @@ class _RecorderPage extends State<RecorderPage> {
         showDialog(
             context: context,
             builder: (BuildContext builder) {
+              var titleController = TextEditingController(text: title);
+              var textController = TextEditingController(text: text);
               return AlertDialog(
+                scrollable: true,
                 title: Text('Edit Speech Text'),
-                content: TextField(
-                  controller: TextEditingController(text: text),
+                content: Center(
+                  child: Form(
+                    child: Column(
+                      children: <Widget>[
+                        TextFormField(
+                          decoration: InputDecoration(
+                            labelText: 'Title',
+                            icon: Icon(Icons.flag),
+                          ),
+                          controller: titleController,
+                        ),
+                        TextFormField(
+                          decoration: InputDecoration(
+                            labelText: 'Detail',
+                            icon: Icon(Icons.text_format_outlined),
+                          ),
+                          controller: textController,
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
+                //   child: Form(
+                //       child: Column(
+                //     children: <Widget>[
+                //       TextFormField(
+                //         controller: TextEditingController(text: title),
+                //       ),
+                //       TextFormField(
+                //         controller: TextEditingController(text: text),
+                //       ),
+                //     ],
+                //   )),
+                // ),
                 actions: [
                   TextButton(
                       onPressed: () => {Navigator.pop(context)},
                       child: Text('Cancel')),
                   TextButton(
                       onPressed: () {
+                        setState(() {
+                          title = titleController.text;
+                          text = textController.text;
+                        });
                         this.saveSpeech();
 
                         Navigator.pop(context);
