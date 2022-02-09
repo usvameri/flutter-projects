@@ -1,15 +1,11 @@
 // import 'dart:html';
-
-import 'package:avatar_glow/avatar_glow.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:speech_to_text/speech_to_text.dart' as stt;
 import 'package:speech_to_todo/db/todo_db.dart';
 import 'package:speech_to_todo/models/todo.dart';
 import 'package:speech_to_todo/pages/HomePage.dart';
 import 'package:speech_to_todo/pages/RecordListPage.dart';
 import 'package:speech_to_todo/pages/RecorderPage.dart';
-import 'package:speech_to_todo/widgets/note_card.dart';
 
 class MainPage extends StatefulWidget {
   const MainPage({Key? key}) : super(key: key);
@@ -19,46 +15,13 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainPage extends State<MainPage> {
-  bool isListening = false;
   int currentIndex = 0;
   final screens = [HomePage(), RecorderPage(), RecordListPage()];
-  String text = "Press button for record your notes.";
-  var _speechToText = stt.SpeechToText();
-  void listen() async {
-    if (!isListening) {
-      bool available = await _speechToText.initialize(
-        onStatus: (status) => print("$status"),
-        onError: (errorNotification) => print("$errorNotification"),
-      );
-      if (available) {
-        setState(() {
-          isListening = true;
-        });
-        _speechToText.listen(
-            onResult: (result) => setState(() {
-                  text = result.recognizedWords;
-                }));
-      }
-    } else {
-      setState(() {
-        isListening = false;
-        _speechToText.stop();
-      });
-      Todo newTodo = Todo(
-          title: 'Note',
-          description: this.text,
-          priority: true,
-          done: false,
-          createdTime: DateTime.now());
-      await TodoDatabase.instance.create(newTodo);
-    }
-  }
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    _speechToText = stt.SpeechToText();
   }
 
   @override
