@@ -2,6 +2,7 @@ import 'package:avatar_glow/avatar_glow.dart';
 import 'package:flutter/material.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
 import 'package:speech_to_todo/db/todo_db.dart';
+import 'package:speech_to_todo/pages/RecordListPage.dart';
 
 import '../models/todo.dart';
 
@@ -17,6 +18,15 @@ class _RecorderPage extends State<RecorderPage> {
   String text = "Press button for record your notes.";
   var _speechToText = stt.SpeechToText();
   bool isListening = false;
+  void saveSpeech() async {
+    Todo newTodo = Todo(
+        title: 'Todo',
+        description: this.text,
+        priority: true,
+        done: false,
+        createdTime: DateTime.now());
+    await TodoDatabase.instance.create(newTodo);
+  }
 
   void listen() async {
     if (!isListening) {
@@ -37,14 +47,29 @@ class _RecorderPage extends State<RecorderPage> {
       setState(() {
         isListening = false;
         _speechToText.stop();
+        showDialog(
+            context: context,
+            builder: (BuildContext builder) {
+              return AlertDialog(
+                title: Text('Edit Speech Text'),
+                content: TextField(
+                  controller: TextEditingController(text: text),
+                ),
+                actions: [
+                  TextButton(
+                      onPressed: () => {Navigator.pop(context)},
+                      child: Text('Cancel')),
+                  TextButton(
+                      onPressed: () {
+                        this.saveSpeech();
+
+                        Navigator.pop(context);
+                      },
+                      child: Text('Save'))
+                ],
+              );
+            });
       });
-      Todo newTodo = Todo(
-          title: 'Note',
-          description: this.text,
-          priority: true,
-          done: false,
-          createdTime: DateTime.now());
-      await TodoDatabase.instance.create(newTodo);
     }
   }
 
@@ -74,7 +99,7 @@ class _RecorderPage extends State<RecorderPage> {
         repeat: true,
         endRadius: 80,
         duration: Duration(milliseconds: 1000),
-        glowColor: Colors.blue,
+        glowColor: isListening ? Colors.red : Colors.blue,
         child: FloatingActionButton(
           onPressed: () => {listen()},
           child: Icon(isListening ? Icons.mic : Icons.mic_none),

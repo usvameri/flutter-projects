@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 import 'package:speech_to_todo/db/todo_db.dart';
 import 'package:speech_to_todo/models/todo.dart';
@@ -11,7 +13,7 @@ class RecordListPage extends StatefulWidget {
 class _RecordListPage extends State<RecordListPage> {
   List<Todo> todos = [];
   bool isLoading = false;
-
+  int? selectedItem = 0;
   @override
   void initState() {
     super.initState();
@@ -23,6 +25,32 @@ class _RecordListPage extends State<RecordListPage> {
   void dispose() {
     TodoDatabase.instance.Close();
     super.dispose();
+  }
+
+  Future deleteTodo() async {
+    return showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Are you sure?'),
+            actions: [
+              TextButton(
+                  onPressed: () {
+                    TodoDatabase.instance.delete(this.selectedItem);
+                    setState(() {
+                      refreshTodos();
+                    });
+                    Navigator.pop(context);
+                  },
+                  child: Text('Delete')),
+              TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: Text('Cancel'))
+            ],
+          );
+        });
   }
 
   Future refreshTodos() async {
@@ -44,11 +72,41 @@ class _RecordListPage extends State<RecordListPage> {
           final item = todos[index];
           return ListTile(
             leading: Icon(Icons.filter_none_outlined),
-            iconColor: Colors.blue,
+            iconColor: selectedItem == item.id ? Colors.white : Colors.blue,
             title: Text(item.title),
             subtitle: Text(item.description),
-            textColor: Colors.blue,
+            textColor: selectedItem == item.id ? Colors.white : Colors.blue,
+            tileColor: selectedItem == item.id ? Colors.blue : null,
+            onLongPress: () {
+              setState(() {
+                selectedItem = item.id;
+                deleteTodo();
+              });
+            },
           );
         });
   }
 }
+
+// onLongPress: () async {
+//               AlertDialog(
+//                 title: Text('Are you sure?'),
+//                 actions: [
+//                   TextButton(
+//                       onPressed: () {
+//                         TodoDatabase.instance.delete(item.id);
+//                       },
+//                       child: Text('Delete')),
+//                   TextButton(
+//                       onPressed: () {
+//                         Navigator.pop(context);
+//                       },
+//                       child: Text('Cancel'))
+//                 ],
+//               );
+//             },
+
+
+// onLongPress: () async {
+//               await deleteTodo(item.id);
+//             },

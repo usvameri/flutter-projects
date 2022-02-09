@@ -71,7 +71,7 @@ class TodoDatabase {
         where: '$TodoFields.id = ?', whereArgs: [todo.id]);
   }
 
-  Future<int> delete(int id) async {
+  Future<int> delete(int? id) async {
     final db = await instance.database;
     return db
         .delete(tableTodos, where: '${TodoFields.id} = ?', whereArgs: [id]);
