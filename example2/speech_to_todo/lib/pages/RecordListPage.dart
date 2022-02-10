@@ -35,6 +35,7 @@ class _RecordListPage extends State<RecordListPage> {
             title: Text('Are you sure?'),
             actions: [
               TextButton(
+                  style: TextButton.styleFrom(backgroundColor: Colors.red),
                   onPressed: () {
                     TodoDatabase.instance.delete(this.selectedItem);
                     setState(() {
@@ -42,15 +43,20 @@ class _RecordListPage extends State<RecordListPage> {
                     });
                     Navigator.pop(context);
                   },
-                  child: Text('Delete')),
+                  child: Text('Delete', style: TextStyle(color: Colors.white),)),
               TextButton(
                   onPressed: () {
+                    setState((){
+                      selectedItem = 0;
+                    });
                     Navigator.pop(context);
                   },
                   child: Text('Cancel'))
             ],
           );
-        });
+        }).whenComplete(() {setState(() {
+          selectedItem = 0;
+        });});
   }
 
   Future refreshTodos() async {
@@ -64,6 +70,12 @@ class _RecordListPage extends State<RecordListPage> {
     });
   }
 
+  Future updateDone(Todo todo) async {
+    var doneState = todo.done ? false : true;
+    var newTodo = todo.copy(done: doneState);
+    await TodoDatabase.instance.update(newTodo);
+    refreshTodos();
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -72,12 +84,16 @@ class _RecordListPage extends State<RecordListPage> {
           itemBuilder: (context, index) {
             final item = todos[index];
             return ListTile(
-              leading: Icon(Icons.filter_none_outlined),
+              leading: item.done ? Icon(Icons.check_box_outlined) : Icon(Icons.check_box_outline_blank),
               iconColor: selectedItem == item.id ? Colors.white : Colors.blue,
               title: Text(item.title),
               subtitle: Text(item.description),
+              trailing: Wrap(children: [Text((item.createdTime.hour.toString() + ':'+ item.createdTime.minute.toString() + ' ' +item.createdTime.day.toString() + '/' + item.createdTime.month.toString()+ '/' + item.createdTime.year.toString()), style: TextStyle(fontSize: 12),)]),
               textColor: selectedItem == item.id ? Colors.white : Colors.blue,
               tileColor: selectedItem == item.id ? Colors.blue : null,
+              onTap: () {
+                updateDone(item);
+              },
               onLongPress: () {
                 setState(() {
                   selectedItem = item.id;
@@ -86,12 +102,16 @@ class _RecordListPage extends State<RecordListPage> {
               },
             );
           }),
-      floatingActionButton: IconButton(
-        onPressed: () => setState(() {
-          refreshTodos();
-        }),
-        icon: Icon(Icons.refresh),
-        color: Colors.blue,
+      floatingActionButton: CircleAvatar(
+        backgroundColor: Colors.blue,
+        child: IconButton(
+          onPressed: () => setState(() {
+            refreshTodos();
+          }),
+          icon: Icon(Icons.refresh),
+          color: Colors.white,
+          
+        ),
       ),
     );
   }

@@ -68,7 +68,7 @@ class TodoDatabase {
   Future<int> update(Todo todo) async {
     final db = await instance.database;
     return db.update(tableTodos, todo.toJson(),
-        where: '$TodoFields.id = ?', whereArgs: [todo.id]);
+        where: '${TodoFields.id} = ?', whereArgs: [todo.id]);
   }
 
   Future<int> delete(int? id) async {
