@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:avatar_glow/avatar_glow.dart';
 import 'package:flutter/material.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
@@ -17,17 +19,86 @@ class _RecorderPage extends State<RecorderPage> {
   int currentState = 1;
   String text = "Press button for record your notes.";
   String title = "Todo";
+  bool? priority = false;
   var _speechToText = stt.SpeechToText();
   bool isListening = false;
 
   void saveSpeech() async {
     Todo newTodo = Todo(
-        title: this.title,
-        description: this.text,
-        priority: true,
+        title: title,
+        description: text,
+        priority: priority!,
         done: false,
         createdTime: DateTime.now());
     await TodoDatabase.instance.create(newTodo);
+    text = "Press button for record your notes.";
+    title = "Todo";
+    priority = false;
+  }
+
+  void _showDialog(){
+    showDialog(
+            context: context,
+            builder: (BuildContext builder) {
+              var titleController = TextEditingController(text: title);
+              var textController = TextEditingController(text: text);
+              return StatefulBuilder(
+                builder: (context, setState){
+                      return AlertDialog(
+                  scrollable: true,
+                  title: Text('Edit Speech Text'),
+                  content: Center(
+                    child: Form(
+                      child: Column(
+                        children: <Widget>[
+                          TextFormField(
+                            decoration: InputDecoration(
+                              labelText: 'Title',
+                              icon: Icon(Icons.flag),
+                            ),
+                            controller: titleController,
+                          ),
+                          TextFormField(
+                            decoration: InputDecoration(
+                              labelText: 'Detail',
+                              icon: Icon(Icons.text_format_outlined),
+                            ),
+                            controller: textController,
+                          ),
+                          CheckboxListTile(value: priority , title: Transform.translate(offset: const Offset(140, 0),child: Text('Priority'),), onChanged: (value) {
+                            setState(() {
+                              this.priority = value;
+                            },);
+                          } )
+                        ],
+                      ),
+                    ),
+                  ),
+                  actions: [
+                    TextButton(
+                        onPressed: () => {Navigator.pop(context)},
+                        child: Text('Cancel')),
+                    TextButton(
+                        onPressed: () {
+                          setState(() {
+                            title = titleController.text;
+                            text = textController.text;
+                          });
+                          saveSpeech();
+              
+                          Navigator.pop(context);
+                        },
+                        child: Text('Save'))
+                  ],
+                      );}
+
+
+
+
+
+                );
+              
+            });
   }
 
   void listen() async {
@@ -49,66 +120,8 @@ class _RecorderPage extends State<RecorderPage> {
       setState(() {
         isListening = false;
         _speechToText.stop();
-        showDialog(
-            context: context,
-            builder: (BuildContext builder) {
-              var titleController = TextEditingController(text: title);
-              var textController = TextEditingController(text: text);
-              return AlertDialog(
-                scrollable: true,
-                title: Text('Edit Speech Text'),
-                content: Center(
-                  child: Form(
-                    child: Column(
-                      children: <Widget>[
-                        TextFormField(
-                          decoration: InputDecoration(
-                            labelText: 'Title',
-                            icon: Icon(Icons.flag),
-                          ),
-                          controller: titleController,
-                        ),
-                        TextFormField(
-                          decoration: InputDecoration(
-                            labelText: 'Detail',
-                            icon: Icon(Icons.text_format_outlined),
-                          ),
-                          controller: textController,
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                //   child: Form(
-                //       child: Column(
-                //     children: <Widget>[
-                //       TextFormField(
-                //         controller: TextEditingController(text: title),
-                //       ),
-                //       TextFormField(
-                //         controller: TextEditingController(text: text),
-                //       ),
-                //     ],
-                //   )),
-                // ),
-                actions: [
-                  TextButton(
-                      onPressed: () => {Navigator.pop(context)},
-                      child: Text('Cancel')),
-                  TextButton(
-                      onPressed: () {
-                        setState(() {
-                          title = titleController.text;
-                          text = textController.text;
-                        });
-                        this.saveSpeech();
-
-                        Navigator.pop(context);
-                      },
-                      child: Text('Save'))
-                ],
-              );
-            });
+        _showDialog();
+        
       });
     }
   }
