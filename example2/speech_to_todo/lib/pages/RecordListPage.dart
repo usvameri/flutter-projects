@@ -1,8 +1,8 @@
 import 'dart:ffi';
-
 import 'package:flutter/material.dart';
 import 'package:speech_to_todo/db/todo_db.dart';
 import 'package:speech_to_todo/models/todo.dart';
+import 'package:speech_to_todo/widgets/categoryCard.dart';
 
 class RecordListPage extends StatefulWidget {
   const RecordListPage({Key? key}) : super(key: key);
@@ -43,10 +43,13 @@ class _RecordListPage extends State<RecordListPage> {
                     });
                     Navigator.pop(context);
                   },
-                  child: Text('Delete', style: TextStyle(color: Colors.white),)),
+                  child: Text(
+                    'Delete',
+                    style: TextStyle(color: Colors.white),
+                  )),
               TextButton(
                   onPressed: () {
-                    setState((){
+                    setState(() {
                       selectedItem = 0;
                     });
                     Navigator.pop(context);
@@ -54,9 +57,11 @@ class _RecordListPage extends State<RecordListPage> {
                   child: Text('Cancel'))
             ],
           );
-        }).whenComplete(() {setState(() {
-          selectedItem = 0;
-        });});
+        }).whenComplete(() {
+      setState(() {
+        selectedItem = 0;
+      });
+    });
   }
 
   Future refreshTodos() async {
@@ -76,43 +81,100 @@ class _RecordListPage extends State<RecordListPage> {
     await TodoDatabase.instance.update(newTodo);
     refreshTodos();
   }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: ListView.builder(
-          itemCount: todos.length,
-          itemBuilder: (context, index) {
-            final item = todos[index];
-            return ListTile(
-              leading: item.done ? Icon(Icons.check_box_outlined) : Icon(Icons.check_box_outline_blank),
-              iconColor: selectedItem == item.id ? Colors.white : Colors.blue,
-              title: Text(item.title),
-              subtitle: Text(item.description),
-              trailing: Wrap(children: [Text((item.createdTime.hour.toString() + ':'+ item.createdTime.minute.toString() + ' ' +item.createdTime.day.toString() + '/' + item.createdTime.month.toString()+ '/' + item.createdTime.year.toString()), style: TextStyle(fontSize: 12),)]),
-              textColor: selectedItem == item.id ? Colors.white : Colors.blue,
-              tileColor: selectedItem == item.id ? Colors.blue : null,
-              onTap: () {
-                updateDone(item);
-              },
-              onLongPress: () {
-                setState(() {
-                  selectedItem = item.id;
-                  deleteTodo();
-                });
-              },
-            );
-          }),
-      floatingActionButton: CircleAvatar(
-        backgroundColor: Colors.blue,
-        child: IconButton(
-          onPressed: () => setState(() {
-            refreshTodos();
-          }),
-          icon: Icon(Icons.refresh),
-          color: Colors.white,
-          
+    final Size size = MediaQuery.of(context).size;
+
+    return Container(
+      child: Scaffold(
+        backgroundColor: Colors.white,
+        body: Container(
+          height: size.height,
+          child: Column(
+            children: <Widget>[
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: const <Widget>[
+                  Text(
+                    'Daily',
+                    style: TextStyle(
+                        color: Colors.grey,
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700),
+                  ),
+                  Text(
+                    'Montlyh',
+                    style: TextStyle(
+                        color: Colors.grey,
+                        fontWeight: FontWeight.w700,
+                        fontSize: 18),
+                  )
+                ],
+              ),
+              const SizedBox(
+                height: 10,
+              ),
+              CategoryCard(
+                data: todos,
+              ),
+              Row(
+                children: [
+                  Center(
+                    widthFactor: 10,
+                    child: CircleAvatar(
+                      backgroundColor: Colors.blue,
+                      child: IconButton(
+                        onPressed: () => setState(() {
+                          refreshTodos();
+                        }),
+                        icon: Icon(Icons.refresh),
+                        color: Colors.white,
+                      ),
+                    ),
+                  )
+                ],
+              )
+            ],
+          ),
         ),
       ),
     );
   }
 }
+//  return Scaffold(
+//       body: ListView.builder(
+//           itemCount: todos.length,
+//           itemBuilder: (context, index) {
+//             final item = todos[index];
+//             return ListTile(
+//               leading: item.done ? Icon(Icons.check_box_outlined) : Icon(Icons.check_box_outline_blank),
+//               iconColor: selectedItem == item.id ? Colors.white : Colors.blue,
+//               title: Text(item.title),
+//               subtitle: Text(item.description),
+//               trailing: Wrap(children: [Text((item.createdTime.hour.toString() + ':'+ item.createdTime.minute.toString() + ' ' +item.createdTime.day.toString() + '/' + item.createdTime.month.toString()+ '/' + item.createdTime.year.toString()), style: TextStyle(fontSize: 12),)]),
+//               textColor: selectedItem == item.id ? Colors.white : Colors.blue,
+//               tileColor: selectedItem == item.id ? Colors.blue : null,
+//               onTap: () {
+//                 updateDone(item);
+//               },
+//               onLongPress: () {
+//                 setState(() {
+//                   selectedItem = item.id;
+//                   deleteTodo();
+//                 });
+//               },
+//             );
+//           }),
+//       floatingActionButton: CircleAvatar(
+//         backgroundColor: Colors.blue,
+//         child: IconButton(
+//           onPressed: () => setState(() {
+//             refreshTodos();
+//           }),
+//           icon: Icon(Icons.refresh),
+//           color: Colors.white,
+          
+//         ),
+//       ),
+//     );
